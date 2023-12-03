@@ -1,5 +1,7 @@
 package xyz.moyyn.program.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,8 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/persons")
 public class PersonController {
+
+    private static final Logger logger = LoggerFactory.getLogger(PersonController.class);
 
     @Autowired
     private PersonService personSvc;
@@ -31,8 +35,10 @@ public class PersonController {
 
             var person = personSvc.getPersonById(id);
             if (person.isEmpty()) {
+                logger.warn("Person not found with Id: {}", id);
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             } else {
+                logger.info("Person found: {}", person);
                 return new ResponseEntity<>(person.get(), HttpStatus.OK);
             }
     }
@@ -42,8 +48,10 @@ public class PersonController {
 
         var newPerson = personSvc.savePerson(person);
         if (newPerson.isEmpty()) {
+            logger.warn("Person save failed with RequestBody {}", person);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
+            logger.info("Person saved as {}", newPerson);
             return new ResponseEntity<>(newPerson.get(), HttpStatus.OK);
         }
     }
